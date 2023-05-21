@@ -2,7 +2,7 @@
 import fs from 'fs/promises';
 import { input } from '@inquirer/prompts';
 
-import { getProduct, getProductList, saveToDb } from './helpers';
+import { exitProcess, getProduct, getProductList, saveToDb } from './helpers';
 import { commands } from './commands';
 import { Product } from './types';
 
@@ -27,15 +27,13 @@ async function cli() {
           console.log('Product List:', productList);
           break;
         case commands.exit:
-            process.exitCode = 0;
-            process.exit();
+          exitProcess(0);
       }
     }
     cli();
    } catch(error) {
     console.error(error);
-    process.exitCode = 0;
-    process.exit();
+    exitProcess(1);
    }
 }
 

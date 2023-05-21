@@ -59,3 +59,8 @@ export async function getProductList(): Promise<Product[]> {
     const productList = await fs.readFile(url, {encoding: 'utf-8'}).then(data => JSON.parse(data));
     return productList;
 }
+
+export function exitProcess(code: number){
+    process.exitCode = code;
+    process.exit();
+}
