@@ -1,22 +1,7 @@
-export const productList: Product[] = [];
+import inquirer from 'inquirer';
+import { input } from '@inquirer/prompts';
 
-export interface Product {
-    type: ProductType;
-    name: string;
-    weight?: number;
-    volume?: number;
-}
-
-export enum Measurement{
-    Liters='liters',
-    Gramms='gramms',
-}
-
-
-export const enum ProductType {
-    IceCream="ice cream",
-    SoftDrink="soft drink"
-}
+import { Measurement, Product, ProductType } from "./types";
 
 export function getUnity(type: ProductType): [Measurement, string] {
     switch(type) {
@@ -35,3 +20,29 @@ export function getMeasurement(type: ProductType, measure: number) {
             return {volume: measure};
     }
 };
+
+export async function getProduct(): Promise<Product> {
+    const rawProduct =  await inquirer.prompt([
+        {
+            name: 'type',
+            type: 'list',
+            message: 'Select product type:',
+            choices: [ProductType.IceCream, ProductType.SoftDrink]  
+        },
+        {
+            name: 'name',
+            message: 'Product name:',
+            validate: value => value.length >= 3,
+        }
+      ]);
+    const [unity, measureType] = getUnity(rawProduct.type);
+    const measure =  await input({
+        message: `Product ${measureType} in ${unity}:`,
+        validate: (value) => !!value.length && !isNaN(+value),
+    });
+    const productMeasure = getMeasurement(rawProduct.type, +measure);
+    return {
+        ...rawProduct,
+        ...productMeasure
+    };
+}

@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 import fs from 'fs/promises';
 import path from 'path';
-import { Product, ProductType, getMeasurement, getUnity } from './helpers';
-import { commands } from './commands';
 import { input } from '@inquirer/prompts';
-import inquirer from 'inquirer';
+
+import { getProduct } from './helpers';
+import { commands } from './commands';
+import { Product } from './types';
 
 
 async function cli() {
@@ -19,30 +20,7 @@ async function cli() {
     } else{
       switch(command) {
         case commands.addProduct:
-          const rawProduct =  await inquirer.prompt([
-            {
-                name: 'type',
-                type: 'list',
-                message: 'Select product type:',
-                choices: [ProductType.IceCream, ProductType.SoftDrink]  
-            },
-            {
-                name: 'name',
-                message: 'Product name:',
-                validate: value => value.length >= 3,
-            }
-          ]);
-         
-          const [unity, measureType] = getUnity(rawProduct.type);
-          const measure =  await input({
-            message: `Product ${measureType} in ${unity}:`,
-            validate: (value) => !!value.length && !isNaN(+value),
-          });
-          const productMeasure = getMeasurement(rawProduct.type, +measure);
-          const product: Product = {
-            ...rawProduct,
-            ...productMeasure
-          };
+          const product = await getProduct();
           productList.push(product);
           await fs.writeFile(url, JSON.stringify(productList));
           console.log('Product Added');
