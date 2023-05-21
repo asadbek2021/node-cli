@@ -10,10 +10,8 @@ import inquirer from 'inquirer';
 async function cli() {
     const url = path.join(process.cwd(),'db','db.json');
     const productList: Product[] = await fs.readFile(url, {encoding: 'utf-8'}).then(data => JSON.parse(data));
-    console.log(`Console application start!
-    PS: type 'exit' to terminate process`);
     const command = await input({
-            message: 'Feel free to write commands:',
+        message: 'Feel free to write commands:',
     })
     if(!Object.values(commands).includes(command)){
         console.error(`Provided incorrect command: ${command}`);
@@ -24,18 +22,19 @@ async function cli() {
             {
                 name: 'type',
                 type: 'list',
-                message: 'Select product type: ',
+                message: 'Select product type:',
                 choices: [ProductType.IceCream, ProductType.SoftDrink]  
             },
             {
                 name: 'name',
-                message: 'Product name: ',
+                message: 'Product name:',
+                validate: value => value.length >= 3,
             }
           ]);
          
           const [unity, measureType] = getUnity(rawProduct.type);
           const measure =  await input({
-            message: `Product ${measureType} in ${unity}: `,
+            message: `Product ${measureType} in ${unity}:`,
             validate: (value) => !!value.length && !isNaN(+value),
           });
           const productMeasure = getMeasurement(rawProduct.type, +measure);
@@ -49,13 +48,14 @@ async function cli() {
           console.log(product);
           break;
         case commands.showList:
-          console.log('Product List: ', productList);
+          console.log('Product List:', productList);
           break;
         case commands.exit:
             process.exitCode = 0;
             process.exit();
       }
     }
+    cli();
 }
 
 cli();
