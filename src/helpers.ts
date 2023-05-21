@@ -1,7 +1,11 @@
+import fs from 'fs/promises';
+import path from 'path';
 import inquirer from 'inquirer';
 import { input } from '@inquirer/prompts';
 
 import { Measurement, Product, ProductType } from "./types";
+
+const url = path.join(process.cwd(),'db','db.json');
 
 export function getUnity(type: ProductType): [Measurement, string] {
     switch(type) {
@@ -45,4 +49,13 @@ export async function getProduct(): Promise<Product> {
         ...rawProduct,
         ...productMeasure
     };
+}
+
+export async function saveToDb(products: Product[]) {
+    await fs.writeFile(url, JSON.stringify(products));
+}
+
+export async function getProductList(): Promise<Product[]> {
+    const productList = await fs.readFile(url, {encoding: 'utf-8'}).then(data => JSON.parse(data));
+    return productList;
 }
