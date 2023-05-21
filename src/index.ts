@@ -8,6 +8,7 @@ import inquirer from 'inquirer';
 
 
 async function cli() {
+   try {
     const url = path.join(process.cwd(),'db','db.json');
     const productList: Product[] = await fs.readFile(url, {encoding: 'utf-8'}).then(data => JSON.parse(data));
     const command = await input({
@@ -56,6 +57,11 @@ async function cli() {
       }
     }
     cli();
+   } catch(error) {
+    console.error(error);
+    process.exitCode = 0;
+    process.exit();
+   }
 }
 
 cli();
